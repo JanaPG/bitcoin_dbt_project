@@ -1,0 +1,13 @@
+
+select
+tx.hash_key,
+tx.block_number,
+tx.block_timestamp,
+tx.is_coinbase,
+f.value:address::STRING as output_address,
+f.value:value::FLOAT as output_value
+
+from {{ref('stg_btc')}} tx,
+lateral flatten (input => outputs) f
+
+WHERE f.value:address::STRING IS NOT NULL
