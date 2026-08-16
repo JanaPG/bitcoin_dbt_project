@@ -1,0 +1,44 @@
+# Runbook: Snowflake Trial Expired — Reconnecting dbt Core
+
+Snowflake trial credits ran out → account is gone → dbt project needs to point at a new account. Models and repo don't change. Follow in order.
+
+## 1. Reinitiate the dbt profile
+```bash
+dbt init
+```
+- Detects the existing project, asks to reconfigure the profile → **yes**
+- Enter new account locator, username, password, role, warehouse, database, schema
+- This rewrites `profiles.yml` for you (not tracked in git — credentials never belong in the repo)
+
+## 2. Verify the connection
+```bash
+dbt debug
+```
+Fix any account/user/warehouse/database mismatch before continuing.
+
+## 3. Recreate Snowflake objects
+New trial = empty account. Recreate what your project needs:
+- Warehouse
+- Database / schema(s)
+- Any external stage / storage integration (if sourcing from S3 or similar)
+- Any scheduled **tasks** (e.g. auto-refresh jobs) — these do **not** carry over and must be recreated separately
+
+## 4. Reload source data
+Raw data from the old account is gone. Reload it:
+- Small files → `dbt seed`
+- Larger / external sources → re-run your COPY INTO / stage load process
+
+## 5. Rebuild
+```bash
+dbt run
+dbt test
+```
+
+## 6. Sanity check
+```bash
+dbt run --select <one_model>   # spot check before full rebuild
+dbt list                        # confirm dbt sees all sources/models
+```
+
+---
+**Why this happens:** dbt only stores *connection config* locally (`profiles.yml`) — it has no awareness of the Snowflake account's data, warehouses, or tasks. Losing the account means losing everything on Snowflake's side; the dbt project (models, macros, YAML) is unaffected since it lives in git.
