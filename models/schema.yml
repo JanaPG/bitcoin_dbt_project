@@ -11,5 +11,27 @@ models:
     tests:
       - dbt_utils.equal_rowcount:
           compare_model: ref('stg_btc_transactions')
+  - name: whale_alert
+    columns:
+      - name: output_address
+        data_tests:
+          - check_valid_btc_address
+
+exposures:
+
+  - name: btc_whale_alert
+    label: whales in bitcoin transactions
+    type: dashboard
+    maturity: high
+    url: https://datastudio.google.com/reporting/cbc34db8-ffd7-4b6d-acf0-b86606307713
+    description: >
+      Whales
+
+    depends_on:
+      - ref('whale_alert')
+      
+    owner:
+      name: Jana PG
+      email: janapg03@gmail.com
   
 
