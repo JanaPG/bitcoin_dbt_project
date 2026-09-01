@@ -8,7 +8,7 @@ on:
 jobs:
   dbt-run:
     runs-on: ubuntu-latest
-    environment: DBT_BTC
+    environment: DB_BTC
 
     steps:
       - name: Checkout repo
