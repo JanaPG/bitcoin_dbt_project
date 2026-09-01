@@ -15,5 +15,6 @@ select
 w.output_address,
 w.total_sent,
 w.tx_count,
-{{ convert_to_usd('w.total_sent') }}  as total_sent_usd
+{{ convert_to_usd('w.total_sent') }}  as total_sent_usd,
+--1 as constant
 from WHALE w

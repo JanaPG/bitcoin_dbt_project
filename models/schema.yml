@@ -12,10 +12,34 @@ models:
       - dbt_utils.equal_rowcount:
           compare_model: ref('stg_btc_transactions')
   - name: whale_alert
+    latest_version: 2
+    config:
+      contract:
+        enforced: true
     columns:
+
       - name: output_address
+        data_type: string
         data_tests:
-          - check_valid_btc_address
+          - assert_valid_btc_address
+      - name: total_sent
+        data_type: float
+      - name: tx_count
+        data_type: int
+      - name: total_sent_usd
+        data_type: float
+
+    versions:
+      - v: 1
+        # Matches what's above
+      - v: 2
+        # Breaking change: removed total_sent_usd
+        columns:
+          - include: all
+            exclude: [total_sent_usd]
+
+
+
 
 exposures:
 
@@ -28,7 +52,7 @@ exposures:
       Whales
 
     depends_on:
-      - ref('whale_alert')
+      - ref('whale_alert', v=2)
       
     owner:
       name: Jana PG
