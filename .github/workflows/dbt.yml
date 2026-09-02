@@ -26,14 +26,14 @@ jobs:
 
 
       - name: Set up dbt profile and private key
-        run: |
-          mkdir -p ~/.dbt
-          echo "$PROFILES_YML" > ~/.dbt/profiles.yml
-          echo "$DBT_PRIVATE_KEY" > ~/.dbt/rsa_key.p8
-          chmod 600 ~/.dbt/rsa_key
         env:
           PROFILES_YML: ${{ secrets.PROFILES_YML }}
           DBT_PRIVATE_KEY: ${{ secrets.DBT_PRIVATE_KEY }}
+        run: |
+          mkdir -p "$HOME/.dbt"
+          printf '%s\n' "$PROFILES_YML" > "$HOME/.dbt/profiles.yml"
+          printf '%s\n' "$DBT_PRIVATE_KEY" > "$HOME/.dbt/rsa_key.p8"
+          chmod 600 "$HOME/.dbt/rsa_key.p8"
 
 
 
